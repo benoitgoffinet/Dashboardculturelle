@@ -84,6 +84,7 @@ def generer_donnees(n=500):
     # ── Dates réalistes ──────────────────────────────────────
     dates       = pd.date_range("2022-01-01", periods=n, freq="D")
     dates_array = dates.to_numpy()
+    dates_array = dates_array.copy()
     np.random.shuffle(dates_array)
 
     df["date"]  = sorted(dates_array)
