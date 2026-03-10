@@ -57,9 +57,10 @@ def theme_fig(fig, height=320):
     return fig
 
 # ─── Composants réutilisables ────────────────────────────────
-def card(children, **kwargs):
+def card(children, className="", **kwargs):
     return html.Div(
         children,
+        className=f"dc-card {className}".strip(),
         style={
             "backgroundColor": C["card"],
             "border": f"1px solid {C['border']}",
@@ -99,6 +100,7 @@ DROPDOWN_STYLE = {"backgroundColor": C["card"], "color": C["text"]}
 # LAYOUT
 # ============================================================
 app.layout = html.Div(
+    className="app-shell",
     style={"backgroundColor": C["bg"], "minHeight": "100vh",
            "fontFamily": "'Inter', 'Segoe UI', sans-serif",
            "padding": "16px 24px"},
@@ -113,7 +115,7 @@ app.layout = html.Div(
                 html.P("Dashboard prédictif d'affluence",
                        style={"color": C["sub"], "margin": "4px 0 0",
                               "fontSize": "13px"})
-            ]),
+            ], style={"minWidth": "230px", "flex": "1"}),
             html.Div([
                 html.Span(f"MAE : ±{MAE} spectateurs",
                           style={"color": C["orange"], "fontSize": "13px",
@@ -121,7 +123,7 @@ app.layout = html.Div(
                 html.Span(f"R² : {R2}",
                           style={"color": C["green"], "fontSize": "13px"})
             ])
-        ], style={"display": "flex", "justifyContent": "space-between",
+        ], className="app-header", style={"display": "flex", "justifyContent": "space-between",
                   "alignItems": "center",
                   "borderBottom": f"1px solid {C['border']}",
                   "paddingBottom": "14px", "marginBottom": "20px"}),
@@ -199,9 +201,9 @@ layout_analyse = html.Div([
     ),
 
     # KPIs
-    html.Div(id="kpis-globaux",
+    html.Div(id="kpis-globaux", className="kpi-grid",
              style={"display": "grid",
-                    "gridTemplateColumns": "repeat(5, 1fr)",
+                    "gridTemplateColumns": "repeat(auto-fit, minmax(180px, 1fr))",
                     "gap": "12px", "marginBottom": "16px"}),
 
     # Ligne 1 : évolution + donut
@@ -213,7 +215,7 @@ layout_analyse = html.Div([
                   dcc.Graph(id="g-evolution",
                             config={"displayModeBar": False})
                   ])
-        ], style={"flex": "2"}),
+        ], style={"flex": "2", "minWidth": "320px"}),
         html.Div([
             card([html.H4("🎭 Affluence par Genre",
                           style={"color": C["text"], "margin": "0 0 8px",
@@ -221,8 +223,8 @@ layout_analyse = html.Div([
                   dcc.Graph(id="g-genre-donut",
                             config={"displayModeBar": False})
                   ])
-        ], style={"flex": "1"}),
-    ], style={"display": "flex", "gap": "12px", "marginBottom": "16px"}),
+        ], style={"flex": "1", "minWidth": "280px"}),
+    ], className="split-row", style={"display": "flex", "gap": "12px", "marginBottom": "16px", "flexWrap": "wrap"}),
 
     # Ligne 2 : heatmap + boxplot
     html.Div([
@@ -238,7 +240,7 @@ layout_analyse = html.Div([
               dcc.Graph(id="g-box",
                         config={"displayModeBar": False})
               ], **{"flex": "1"}),
-    ], style={"display": "flex", "gap": "12px", "marginBottom": "16px"}),
+    ], className="split-row", style={"display": "flex", "gap": "12px", "marginBottom": "16px", "flexWrap": "wrap"}),
 
     # Ligne 3 : importance features
     card([html.H4("🧠 Importance des Variables (Modèle ML)",
@@ -264,9 +266,9 @@ layout_variable = html.Div([
                              for v in VARIABLES_CATEGORIELLES],
                     value="genre",
                     clearable=False,
-                    style={"width": "250px"}
+                    style={"width": "100%"}
                 )
-            ]),
+            ], style={"minWidth": "230px", "flex": "1"}),
             html.Div([
                 html.Label("Métrique",
                            style={"color": C["sub"], "fontSize": "12px",
@@ -301,15 +303,15 @@ layout_variable = html.Div([
                            "fontSize": "14px"}),
             dcc.Graph(id="g-bar-variable",
                       config={"displayModeBar": False})
-        ], flex="1"),
+        ], flex="1", minWidth="320px"),
         card([
             html.H4("📦 Distribution par modalité",
                     style={"color": C["text"], "margin": "0 0 8px",
                            "fontSize": "14px"}),
             dcc.Graph(id="g-violin-variable",
                       config={"displayModeBar": False})
-        ], flex="1"),
-    ], style={"display": "flex", "gap": "12px", "marginBottom": "16px"}),
+        ], flex="1", minWidth="320px"),
+    ], className="split-row", style={"display": "flex", "gap": "12px", "marginBottom": "16px", "flexWrap": "wrap"}),
 
     # Croisement avec une 2ème variable
     card([
@@ -323,9 +325,9 @@ layout_variable = html.Div([
                          for v in VARIABLES_CATEGORIELLES],
                 value="jour",
                 clearable=False,
-                style={"width": "200px"}
+                style={"width": "100%", "minWidth": "180px", "maxWidth": "240px"}
             )
-        ], style={"display": "flex", "justifyContent": "space-between",
+        ], className="cross-header", style={"display": "flex", "justifyContent": "space-between",
                   "alignItems": "center", "marginBottom": "10px"}),
         dcc.Graph(id="g-heatmap-variable",
                   config={"displayModeBar": False})
@@ -425,13 +427,13 @@ layout_predict = html.Div([
                             "borderRadius": "8px", "fontSize": "15px",
                             "fontWeight": "700", "cursor": "pointer"
                         })
-        ], flex="1"),
+        ], flex="1", minWidth="320px"),
 
         # Résultats
         html.Div([
-            html.Div(id="result-kpis",
+            html.Div(id="result-kpis", className="kpi-grid",
                      style={"display": "grid",
-                            "gridTemplateColumns": "repeat(2, 1fr)",
+                            "gridTemplateColumns": "repeat(auto-fit, minmax(220px, 1fr))",
                             "gap": "12px", "marginBottom": "16px"}),
             card([
                 html.H4("📊 Jauge de remplissage",
@@ -447,9 +449,9 @@ layout_predict = html.Div([
                 dcc.Graph(id="g-radar",
                           config={"displayModeBar": False})
             ]),
-        ], style={"flex": "1.4"}),
+        ], style={"flex": "1.4", "minWidth": "320px"}),
 
-    ], style={"display": "flex", "gap": "16px", "alignItems": "flex-start"}),
+    ], className="predict-layout", style={"display": "flex", "gap": "16px", "alignItems": "flex-start", "flexWrap": "wrap"}),
 ])
 
 # ── ONGLET 4 : DONNÉES ───────────────────────────────────────
@@ -718,7 +720,7 @@ def update_variable(var, metric, var2):
             for i, row in agg.iterrows()
         ],
         style={"display": "grid",
-               "gridTemplateColumns": f"repeat({min(len(agg), 6)}, 1fr)",
+               "gridTemplateColumns": "repeat(auto-fit, minmax(170px, 1fr))",
                "gap": "10px"}
     )
 
