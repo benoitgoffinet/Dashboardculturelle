@@ -241,6 +241,14 @@ layout_analyse = html.Div([
                         config={"displayModeBar": False})
               ], **{"flex": "1"}),
     ], className="split-row", style={"display": "flex", "gap": "12px", "marginBottom": "16px", "flexWrap": "wrap"}),
+
+    # Ligne 3 : importance features
+    card([html.H4("🧠 Importance des Variables (Modèle ML)",
+                  style={"color": C["text"], "margin": "0 0 8px",
+                         "fontSize": "14px"}),
+          dcc.Graph(id="g-importance",
+                    config={"displayModeBar": False})
+          ]),
 ])
     
 
