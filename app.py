@@ -241,7 +241,7 @@ layout_analyse = html.Div([
                         config={"displayModeBar": False})
               ], **{"flex": "1"}),
     ], className="split-row", style={"display": "flex", "gap": "12px", "marginBottom": "16px", "flexWrap": "wrap"}),
-
+])
     
 
 # ── ONGLET 2 : ANALYSE PAR VARIABLE ─────────────────────────
