@@ -32,12 +32,12 @@ def generer_donnees(n=500):
 
     df = pd.DataFrame(data)
 
-    # ── Features dérivées ────────────────────────────────────
+    # ── Feature dérivée ──────────────────────────────────────
     df["est_weekend"] = df["jour"].isin(["Samedi", "Dimanche"]).astype(int)
 
-    base = df["capacite"] * 0.5
+    # ── DEMANDE (indépendante de la capacité) ────────────────
+    base = 120  # niveau moyen de demande
 
-    # ── Effets de base ───────────────────────────────────────
     impact_genre = {
         "Musical": 0.25,
         "Comédie": 0.15,
@@ -60,7 +60,6 @@ def generer_donnees(n=500):
         "Soir": 0.25, "Après-midi": 0.10, "Matin": -0.10
     }
 
-    # 🔁 météo corrigée (réaliste)
     impact_meteo = {
         "Ensoleillé": -0.10,
         "Nuageux": 0.00,
@@ -68,7 +67,6 @@ def generer_donnees(n=500):
         "Neigeux": 0.05
     }
 
-    # ── Effet prix dépend du genre (clé !) ───────────────────
     elasticite_prix = {
         "Musical": 0.4,
         "Comédie": 0.7,
@@ -78,7 +76,6 @@ def generer_donnees(n=500):
         "Tragédie": 1.5
     }
 
-    # ── Effet critiques dépend du genre ──────────────────────
     poids_critiques = {
         "Musical": 1,
         "Comédie": 1,
@@ -88,8 +85,8 @@ def generer_donnees(n=500):
         "Tragédie": 4
     }
 
-    # ── Calcul affluence ─────────────────────────────────────
-    affluence = (
+    # ── DEMANDE ──────────────────────────────────────────────
+    demande = (
         base
         + base * df["genre"].map(impact_genre)
         + base * df["jour"].map(impact_jour)
@@ -101,53 +98,55 @@ def generer_donnees(n=500):
         + df["semaine_promo"] * base * 0.20
     )
 
-    # 🔥 PRIX NON LINÉAIRE + dépend du genre
-    affluence -= (df["prix_moyen"] ** 1.3) * df["genre"].map(elasticite_prix)
+    # 🔥 Effet prix non linéaire + dépend du genre
+    demande -= (df["prix_moyen"] ** 1.3) * df["genre"].map(elasticite_prix)
 
-    # ── INTERACTIONS (ce qui rend ton dashboard intéressant) ─
+    # ── INTERACTIONS ─────────────────────────────────────────
 
-    # 🎭 Ballet → boost fort le soir + weekend
-    affluence += np.where(
+    # Ballet → soir + weekend
+    demande += np.where(
         (df["genre"] == "Ballet") & (df["tranche_horaire"] == "Soir"),
         30, 0
     )
-    affluence += np.where(
+    demande += np.where(
         (df["genre"] == "Ballet") & (df["est_weekend"] == 1),
         40, 0
     )
 
-    # 😂 Comédie → boost vendredi + promo
-    affluence += np.where(
+    # Comédie → vendredi + promo
+    demande += np.where(
         (df["genre"] == "Comédie") & (df["jour"] == "Vendredi"),
         25, 0
     )
-    affluence += np.where(
+    demande += np.where(
         (df["genre"] == "Comédie") & (df["semaine_promo"] == 1),
         35, 0
     )
 
-    # 🎭 Tragédie → dépend fortement de la note
-    affluence += np.where(
+    # Tragédie → dépend fortement de la note
+    demande += np.where(
         (df["genre"] == "Tragédie"),
         df["note_moyenne"] * 8,
         0
     )
 
-    # 🎵 Musical → boost été + grande capacité
-    affluence += np.where(
+    # Musical → été + grandes salles
+    demande += np.where(
         (df["genre"] == "Musical") & (df["saison"] == "Été"),
         40, 0
     )
-    affluence += np.where(
+    demande += np.where(
         (df["genre"] == "Musical") & (df["capacite"] >= 300),
         30, 0
     )
 
-    # ── Bruit ────────────────────────────────────────────────
-    affluence += np.random.normal(0, 15, n)
+    # ── Bruit (léger) ────────────────────────────────────────
+    demande += np.random.normal(0, 10, n)
 
-    # ── Finalisation ─────────────────────────────────────────
-    df["affluence"] = np.clip(affluence, 0, df["capacite"]).astype(int)
+    # ── CAPACITÉ = LIMITE ────────────────────────────────────
+    df["affluence"] = np.minimum(demande, df["capacite"]).clip(0).astype(int)
+
+    # ── KPI ──────────────────────────────────────────────────
     df["taux_remplissage"] = (df["affluence"] / df["capacite"] * 100).round(1)
     df["chiffre_affaire"] = (df["affluence"] * df["prix_moyen"]).round(2)
 
