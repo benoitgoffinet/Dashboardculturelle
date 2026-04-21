@@ -16,7 +16,7 @@ from model import predire_affluence, importance_df, MAE, R2
 app = dash.Dash(
     __name__,
     external_stylesheets=[dbc.themes.CYBORG],
-    title="🎭 Théâtre Dashboard",
+    title="Dashboard",
     suppress_callback_exceptions=True,
 )
 server = app.server
