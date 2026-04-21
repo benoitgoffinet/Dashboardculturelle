@@ -72,7 +72,7 @@ def generer_donnees(n=500):
         + base * df["meteo"].map(impact_meteo)
         + df["note_moyenne"]  * 10
         + df["nb_critiques"]  * 2
-        - df["prix_moyen"]    * 0.5
+        - df["prix_moyen"]    * 0.8
         + df["semaine_promo"] * base * 0.15
         + np.random.normal(0, 15, n)
     )
