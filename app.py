@@ -142,11 +142,6 @@ app.layout = html.Div(
                         selected_style={"color": C["text"],
                                         "backgroundColor": C["card"],
                                         "borderTop": f"3px solid {C['purple']}"}),
-                dcc.Tab(label="🔍  Analyse par Variable", value="variable",
-                        style={"color": C["sub"]},
-                        selected_style={"color": C["text"],
-                                        "backgroundColor": C["card"],
-                                        "borderTop": f"3px solid {C['pink']}"}),
                 dcc.Tab(label="🤖  Prédicteur",       value="predict",
                         style={"color": C["sub"]},
                         selected_style={"color": C["text"],
@@ -195,6 +190,24 @@ layout_analyse = html.Div([
                     ("Météo",       "f-meteo",   "meteo"),
                 ]
             ]
+             [html.Div([
+                    html.Label("Métrique", style={"color": C["sub"],
+                                                  "fontSize": "12px",
+                                                  "marginBottom": "4px",
+                                                  "display": "block"}),
+                    dcc.RadioItems(
+                        id="f-metric",
+                        options=[
+                            {"label": " Affluence moyenne", "value": "affluence"},
+                            {"label": " Taux remplissage (%)", "value": "taux_remplissage"},
+                            {"label": " Chiffre d'affaires", "value": "chiffre_affaire"},
+                        ],
+                        value="affluence",
+                        inline=False,
+                        labelStyle={"color": "white", "fontSize": "13px", "display": "block"},
+                        inputStyle={"marginRight": "5px", "marginLeft": "0px"}
+                    )
+                ], style={"minWidth": "230px"})]
         ], style={"display": "flex", "alignItems": "flex-end",
                   "flexWrap": "wrap", "gap": "16px"}),
         marginBottom="16px"
@@ -209,7 +222,7 @@ layout_analyse = html.Div([
     # Ligne 1 : évolution + donut
     html.Div([
         html.Div([
-            card([html.H4("📈 Évolution de l'affluence",
+            card([html.H4(id="titre-evolution",
                           style={"color": C["text"], "margin": "0 0 8px",
                                  "fontSize": "14px"}),
                   dcc.Graph(id="g-evolution",
@@ -217,7 +230,7 @@ layout_analyse = html.Div([
                   ])
         ], style={"flex": "2", "minWidth": "320px"}),
         html.Div([
-            card([html.H4("🎭 Affluence par Genre",
+            card([html.H4(id="titre-genre",
                           style={"color": C["text"], "margin": "0 0 8px",
                                  "fontSize": "14px"}),
                   dcc.Graph(id="g-genre-donut",
@@ -511,7 +524,6 @@ layout_data = html.Div([
               Input("onglets", "value"))
 def afficher_onglet(onglet):
     if onglet == "analyse":  return layout_analyse
-    if onglet == "variable": return layout_variable
     if onglet == "predict":  return layout_predict
     if onglet == "data":     return layout_data
 
@@ -520,6 +532,8 @@ def afficher_onglet(onglet):
 # ============================================================
 @app.callback(
     Output("kpis-globaux",     "children"),
+    Output("titre-evolution",  "children"),
+    Output("titre-genre",      "children"),
     Output("g-evolution",      "figure"),
     Output("g-genre-donut",    "figure"),
     Output("g-heatmap",        "figure"),
@@ -530,9 +544,22 @@ def afficher_onglet(onglet):
     Input("f-saison",    "value"),
     Input("f-horaire",   "value"),
     Input("f-meteo",     "value"),
+    Input("f-metric",    "value"),
 )
-def update_analyse(genres, jours, saisons, horaires, meteos):
+def update_analyse(genres, jours, saisons, horaires, meteos, metric):
     df = DF.copy()
+    metric_labels = {
+        "affluence": "Affluence",
+        "taux_remplissage": "Taux de remplissage",
+        "chiffre_affaire": "Chiffre d'affaires",
+    }
+    metric_units = {
+        "affluence": "",
+        "taux_remplissage": " %",
+        "chiffre_affaire": " €",
+    }
+    metric_label = metric_labels[metric]
+    metric_unit = metric_units[metric]
 
     # Filtres
     for col, val in [("genre", genres), ("jour", jours), ("saison", saisons),
@@ -546,7 +573,7 @@ def update_analyse(genres, jours, saisons, horaires, meteos):
         empty.add_annotation(text="Aucune donnée", showarrow=False,
                              font=dict(color=C["text"]))
         empty = theme_fig(empty)
-        return [], empty, empty, empty, empty, empty
+        return [], "📈 Évolution", "🎭 Répartition par Genre", empty, empty, empty, empty, empty
 
     # ── KPIs ──────────────────────────────────────────────────
     kpis = [
@@ -566,8 +593,8 @@ def update_analyse(genres, jours, saisons, horaires, meteos):
 
     # ── Évolution ─────────────────────────────────────────────
     ev = (df.groupby("mois")
-            .agg(affluence_moy=("affluence", "mean"),
-                 nb_events=("affluence", "count"))
+            .agg(metric_moy=(metric, "mean"),
+                 nb_events=(metric, "count"))
             .reset_index())
     # Trier par date
     ev["sort_key"] = pd.to_datetime(ev["mois"], format="%b %Y")
@@ -575,9 +602,9 @@ def update_analyse(genres, jours, saisons, horaires, meteos):
 
     fig_ev = go.Figure()
     fig_ev.add_trace(go.Scatter(
-        x=ev["mois"], y=ev["affluence_moy"],
+        x=ev["mois"], y=ev["metric_moy"],
         mode="lines+markers",
-        name="Affluence moy.",
+        name=f"{metric_label} moy.",
         line=dict(color=C["purple"], width=2.5),
         marker=dict(size=7),
         fill="tozeroy",
@@ -591,6 +618,7 @@ def update_analyse(genres, jours, saisons, horaires, meteos):
         yaxis="y2"
     ))
     fig_ev.update_layout(
+        yaxis_title=f"{metric_label} moyenne{metric_unit}",
         yaxis2=dict(overlaying="y", side="right",
                     gridcolor="rgba(0,0,0,0)",
                     tickfont_color=C["sub"])
@@ -598,30 +626,30 @@ def update_analyse(genres, jours, saisons, horaires, meteos):
     fig_ev = theme_fig(fig_ev)
 
     # ── Donut Genre ───────────────────────────────────────────
-    g_genre = (df.groupby("genre")["affluence"]
+    g_genre = (df.groupby("genre")[metric]
                  .mean()
                  .reset_index()
-                 .sort_values("affluence", ascending=False))
+                 .sort_values(metric, ascending=False))
     fig_donut = go.Figure(go.Pie(
         labels=g_genre["genre"],
-        values=g_genre["affluence"].round(0),
+        values=g_genre[metric].round(1),
         hole=0.5,
         marker_colors=PALETTE,
         textfont_size=11,
     ))
     fig_donut.update_layout(
-        annotations=[dict(text="Affluence<br>moy.", x=0.5, y=0.5,
+         annotations=[dict(text=f"{metric_label}<br>moy.", x=0.5, y=0.5,
                           font_size=11, showarrow=False,
                           font_color=C["sub"])]
     )
     fig_donut = theme_fig(fig_donut)
 
     # ── Heatmap Jour × Saison ─────────────────────────────────
-    heat = (df.groupby(["jour", "saison"])["taux_remplissage"]
+    heat = (df.groupby(["jour", "saison"])[metric]
               .mean()
               .reset_index()
               .pivot(index="jour", columns="saison",
-                     values="taux_remplissage"))
+                     values=metric))
 
     # Ordonner les jours
     ordre_jours = ["Lundi", "Mardi", "Mercredi", "Jeudi",
@@ -634,7 +662,7 @@ def update_analyse(genres, jours, saisons, horaires, meteos):
         y=heat.index.tolist(),
         colorscale=[[0, "#0d1117"], [0.5, C["purple"]], [1, C["pink"]]],
         text=heat.values.round(1),
-        texttemplate="%{text}%",
+        texttemplate="%{text}" + ("%" if metric == "taux_remplissage" else ""),
         colorbar=dict(tickfont_color=C["sub"])
     ))
     fig_heat = theme_fig(fig_heat)
@@ -644,7 +672,7 @@ def update_analyse(genres, jours, saisons, horaires, meteos):
     for i, genre in enumerate(df["genre"].unique()):
         sub = df[df["genre"] == genre]
         fig_box.add_trace(go.Box(
-            y=sub["taux_remplissage"],
+            y=sub[metric],
             name=genre,
             marker_color=PALETTE[i % len(PALETTE)],
             boxmean=True
@@ -667,7 +695,9 @@ def update_analyse(genres, jours, saisons, horaires, meteos):
     fig_imp.update_layout(yaxis=dict(autorange="reversed"))
     fig_imp = theme_fig(fig_imp, height=300)
 
-    return kpis, fig_ev, fig_donut, fig_heat, fig_box, fig_imp
+    titre_ev = f"📈 Évolution de {metric_label.lower()}"
+    titre_genre = f"🎭 {metric_label} moyenne par Genre"
+    return kpis, titre_ev, titre_genre, fig_ev, fig_donut, fig_heat, fig_box, fig_imp
 
 
 # ============================================================
