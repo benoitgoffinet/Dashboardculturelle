@@ -189,7 +189,7 @@ layout_analyse = html.Div([
                     ("Horaire",     "f-horaire", "tranche_horaire"),
                     ("Météo",       "f-meteo",   "meteo"),
                 ]
-            ] +     
+            ]      
         ], style={"display": "flex", "alignItems": "flex-end",
                   "flexWrap": "wrap", "gap": "16px"}),
         marginBottom="12px"
