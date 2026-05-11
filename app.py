@@ -195,6 +195,12 @@ layout_analyse = html.Div([
         marginBottom="12px"
     ),
 
+     # KPIs
+    html.Div(id="kpis-globaux", className="kpi-grid",
+             style={"display": "grid",
+                    "gridTemplateColumns": "repeat(auto-fit, minmax(180px, 1fr))",
+                    "gap": "12px", "marginBottom": "16px"}),
+
     card(
         html.Div([
             html.Label("Métrique", style={"color": C["sub"],
@@ -217,11 +223,6 @@ layout_analyse = html.Div([
         marginBottom="16px"
     ),
 
-    # KPIs
-    html.Div(id="kpis-globaux", className="kpi-grid",
-             style={"display": "grid",
-                    "gridTemplateColumns": "repeat(auto-fit, minmax(180px, 1fr))",
-                    "gap": "12px", "marginBottom": "16px"}),
 
     # Ligne 1 : évolution + donut
     html.Div([
@@ -243,7 +244,15 @@ layout_analyse = html.Div([
         ], style={"flex": "1", "minWidth": "280px"}),
     ], className="split-row", style={"display": "flex", "gap": "12px", "marginBottom": "16px", "flexWrap": "wrap"}),
 
-    # Ligne 2 : distribution + heatmap
+    # Ligne 2 : métrique selon le prix
+    card([html.H4(id="titre-prix",
+                  style={"color": C["text"], "margin": "0 0 8px",
+                         "fontSize": "14px"}),
+          dcc.Graph(id="g-prix-bar",
+                    config={"displayModeBar": False})
+          ], marginBottom="16px"),
+
+    # Ligne 3 : distribution + heatmap
     html.Div([
         card([html.H4(id="titre-distribution",
                       style={"color": C["text"], "margin": "0 0 8px",
@@ -540,6 +549,8 @@ def afficher_onglet(onglet):
     Output("titre-genre",      "children"),
     Output("g-evolution",      "figure"),
     Output("g-genre-donut",    "figure"),
+    Output("titre-prix",       "children"),
+    Output("g-prix-bar",       "figure"),
     Output("titre-distribution","children"),
     Output("g-box",            "figure"),
     Output("titre-heatmap",    "children"),
@@ -579,7 +590,7 @@ def update_analyse(genres, jours, saisons, horaires, meteos, metric):
         empty.add_annotation(text="Aucune donnée", showarrow=False,
                              font=dict(color=C["text"]))
         empty = theme_fig(empty)
-        return [], "📈 Évolution", "🎭 Répartition par Genre", empty, empty, "📦 Distribution", empty, "🗓️ Heatmap", empty, empty
+        return [], "📈 Évolution", "🎭 Répartition par Genre", empty, empty, "💶 Métrique moyenne par prix", empty, "📦 Distribution", empty, "🗓️ Heatmap", empty, empty
 
     # ── KPIs ──────────────────────────────────────────────────
     kpis = [
@@ -602,7 +613,7 @@ def update_analyse(genres, jours, saisons, horaires, meteos, metric):
             .agg(metric_moy=(metric, "mean"),
                  nb_events=(metric, "count"))
             .reset_index())
-    # Trier par date
+    
     ev["sort_key"] = pd.to_datetime(ev["mois"], format="%b %Y")
     ev = ev.sort_values("sort_key")
 
@@ -630,6 +641,26 @@ def update_analyse(genres, jours, saisons, horaires, meteos, metric):
                     tickfont_color=C["sub"])
     )
     fig_ev = theme_fig(fig_ev)
+
+    # ── Métrique selon le prix moyen ──────────────────────────
+    prix_metric = (df.groupby("prix_moyen")[metric]
+                     .mean()
+                     .reset_index()
+                     .sort_values("prix_moyen"))
+
+    fig_prix = go.Figure(go.Bar(
+        x=prix_metric["prix_moyen"],
+        y=prix_metric[metric],
+        marker=dict(color=C["orange"]),
+        text=prix_metric[metric].round(1),
+        textposition="outside",
+        name=f"{metric_label} moyen"
+    ))
+    fig_prix.update_layout(
+        xaxis_title="Prix moyen (€)",
+        yaxis_title=f"{metric_label} moyen{metric_unit}"
+    )
+    fig_prix = theme_fig(fig_prix)
 
     # ── Donut Genre ───────────────────────────────────────────
     g_genre = (df.groupby("genre")[metric]
@@ -702,10 +733,11 @@ def update_analyse(genres, jours, saisons, horaires, meteos, metric):
     fig_imp = theme_fig(fig_imp, height=300)
 
     titre_ev = f"📈 Évolution de {metric_label.lower()}"
+    titre_prix = f"💶 {metric_label} moyen par prix"
     titre_genre = f"🎭 {metric_label} par Genre"
     titre_dist = f"📦 Distribution de {metric_label.lower()}"
     titre_heat = f"🗓️ Heatmap {metric_label} (Jour × Saison)"
-    return kpis, titre_ev, titre_genre, fig_ev, fig_donut, titre_dist, fig_box, titre_heat, fig_heat, fig_imp
+    return kpis, titre_ev, titre_genre, fig_ev, fig_donut, titre_prix, fig_prix, titre_dist, fig_box, titre_heat, fig_heat, fig_imp
 
 
 # ============================================================
