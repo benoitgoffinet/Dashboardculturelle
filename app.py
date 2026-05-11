@@ -189,27 +189,31 @@ layout_analyse = html.Div([
                     ("Horaire",     "f-horaire", "tranche_horaire"),
                     ("Météo",       "f-meteo",   "meteo"),
                 ]
-            ] +
-             [html.Div([
-                    html.Label("Métrique", style={"color": C["sub"],
-                                                  "fontSize": "12px",
-                                                  "marginBottom": "4px",
-                                                  "display": "block"}),
-                    dcc.RadioItems(
-                        id="f-metric",
-                        options=[
-                            {"label": " Affluence moyenne", "value": "affluence"},
-                            {"label": " Taux remplissage (%)", "value": "taux_remplissage"},
-                            {"label": " Chiffre d'affaires", "value": "chiffre_affaire"},
-                        ],
-                        value="affluence",
-                        inline=False,
-                        labelStyle={"color": "white", "fontSize": "13px", "display": "block"},
-                        inputStyle={"marginRight": "5px", "marginLeft": "0px"}
-                    )
-                ], style={"minWidth": "230px"})]
+            ] +     
         ], style={"display": "flex", "alignItems": "flex-end",
                   "flexWrap": "wrap", "gap": "16px"}),
+        marginBottom="12px"
+    ),
+
+    card(
+        html.Div([
+            html.Label("Métrique", style={"color": C["sub"],
+                                          "fontSize": "12px",
+                                          "marginBottom": "8px",
+                                          "display": "block"}),
+            dcc.RadioItems(
+                id="f-metric",
+                options=[
+                    {"label": " Affluence moyenne", "value": "affluence"},
+                    {"label": " Taux remplissage (%)", "value": "taux_remplissage"},
+                    {"label": " Chiffre d'affaires", "value": "chiffre_affaire"},
+                ],
+                value="affluence",
+                inline=True,
+                labelStyle={"color": "white", "fontSize": "13px", "marginRight": "20px"},
+                inputStyle={"marginRight": "5px", "marginLeft": "0px"}
+            )
+        ]),
         marginBottom="16px"
     ),
 
@@ -239,18 +243,18 @@ layout_analyse = html.Div([
         ], style={"flex": "1", "minWidth": "280px"}),
     ], className="split-row", style={"display": "flex", "gap": "12px", "marginBottom": "16px", "flexWrap": "wrap"}),
 
-    # Ligne 2 : heatmap + boxplot
+    # Ligne 2 : distribution + heatmap
     html.Div([
-        card([html.H4("🗓️ Heatmap Jour × Saison",
-                      style={"color": C["text"], "margin": "0 0 8px",
-                             "fontSize": "14px"}),
-              dcc.Graph(id="g-heatmap",
-                        config={"displayModeBar": False})
-              ], **{"flex": "1"}),
-        card([html.H4("📦 Distribution Taux de Remplissage",
+        card([html.H4(id="titre-distribution",
                       style={"color": C["text"], "margin": "0 0 8px",
                              "fontSize": "14px"}),
               dcc.Graph(id="g-box",
+                        config={"displayModeBar": False})
+              ], **{"flex": "1"}),
+        card([html.H4(id="titre-heatmap",
+                      style={"color": C["text"], "margin": "0 0 8px",
+                             "fontSize": "14px"}),
+              dcc.Graph(id="g-heatmap",
                         config={"displayModeBar": False})
               ], **{"flex": "1"}),
     ], className="split-row", style={"display": "flex", "gap": "12px", "marginBottom": "16px", "flexWrap": "wrap"}),
@@ -536,8 +540,10 @@ def afficher_onglet(onglet):
     Output("titre-genre",      "children"),
     Output("g-evolution",      "figure"),
     Output("g-genre-donut",    "figure"),
-    Output("g-heatmap",        "figure"),
+    Output("titre-distribution","children"),
     Output("g-box",            "figure"),
+    Output("titre-heatmap",    "children"),
+    Output("g-heatmap",        "figure"),
     Output("g-importance",     "figure"),
     Input("f-genre",     "value"),
     Input("f-jour",      "value"),
@@ -573,7 +579,7 @@ def update_analyse(genres, jours, saisons, horaires, meteos, metric):
         empty.add_annotation(text="Aucune donnée", showarrow=False,
                              font=dict(color=C["text"]))
         empty = theme_fig(empty)
-        return [], "📈 Évolution", "🎭 Répartition par Genre", empty, empty, empty, empty, empty
+        return [], "📈 Évolution", "🎭 Répartition par Genre", empty, empty, "📦 Distribution", empty, "🗓️ Heatmap", empty, empty
 
     # ── KPIs ──────────────────────────────────────────────────
     kpis = [
@@ -697,7 +703,9 @@ def update_analyse(genres, jours, saisons, horaires, meteos, metric):
 
     titre_ev = f"📈 Évolution de {metric_label.lower()}"
     titre_genre = f"🎭 {metric_label} moyenne par Genre"
-    return kpis, titre_ev, titre_genre, fig_ev, fig_donut, fig_heat, fig_box, fig_imp
+    titre_dist = f"📦 Distribution de {metric_label.lower()}"
+    titre_heat = f"🗓️ Heatmap {metric_label} (Jour × Saison)"
+    return kpis, titre_ev, titre_genre, fig_ev, fig_donut, titre_dist, fig_box, titre_heat, fig_heat, fig_imp
 
 
 # ============================================================
