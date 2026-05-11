@@ -189,7 +189,7 @@ layout_analyse = html.Div([
                     ("Horaire",     "f-horaire", "tranche_horaire"),
                     ("Météo",       "f-meteo",   "meteo"),
                 ]
-            ]
+            ] +
              [html.Div([
                     html.Label("Métrique", style={"color": C["sub"],
                                                   "fontSize": "12px",
