@@ -204,7 +204,7 @@ layout_analyse = html.Div([
             dcc.RadioItems(
                 id="f-metric",
                 options=[
-                    {"label": " Affluence moyenne", "value": "affluence"},
+                    {"label": " Affluence", "value": "affluence"},
                     {"label": " Taux remplissage (%)", "value": "taux_remplissage"},
                     {"label": " Chiffre d'affaires", "value": "chiffre_affaire"},
                 ],
@@ -294,7 +294,7 @@ layout_variable = html.Div([
                 dcc.RadioItems(
     id="var-metric",
     options=[
-        {"label": " Affluence moyenne", "value": "affluence"},
+        {"label": " Affluence", "value": "affluence"},
         {"label": " Taux remplissage (%)", "value": "taux_remplissage"},
         {"label": " Chiffre d'affaires", "value": "chiffre_affaire"},
     ],
@@ -624,7 +624,7 @@ def update_analyse(genres, jours, saisons, horaires, meteos, metric):
         yaxis="y2"
     ))
     fig_ev.update_layout(
-        yaxis_title=f"{metric_label} moyenne{metric_unit}",
+        yaxis_title=f"{metric_label} {metric_unit}",
         yaxis2=dict(overlaying="y", side="right",
                     gridcolor="rgba(0,0,0,0)",
                     tickfont_color=C["sub"])
@@ -702,7 +702,7 @@ def update_analyse(genres, jours, saisons, horaires, meteos, metric):
     fig_imp = theme_fig(fig_imp, height=300)
 
     titre_ev = f"📈 Évolution de {metric_label.lower()}"
-    titre_genre = f"🎭 {metric_label} moyenne par Genre"
+    titre_genre = f"🎭 {metric_label} par Genre"
     titre_dist = f"📦 Distribution de {metric_label.lower()}"
     titre_heat = f"🗓️ Heatmap {metric_label} (Jour × Saison)"
     return kpis, titre_ev, titre_genre, fig_ev, fig_donut, titre_dist, fig_box, titre_heat, fig_heat, fig_imp
