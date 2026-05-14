@@ -5,7 +5,8 @@ import dash_bootstrap_components as dbc
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
-import numpy as np
+import numpy as npapp.run
+import os
 
 from data import DF, VARIABLES_CATEGORIELLES, VARIABLES_NUMERIQUES
 from model import predire_affluence, importance_df, MAE, R2
@@ -994,4 +995,5 @@ def predict(n, genre, jour, saison, horaire,
 # RUN
 # ============================================================
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=8050)
+    port = int(os.environ.get("PORT", 8050))
+    app.run(host="0.0.0.0", port=port)
