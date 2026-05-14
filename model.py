@@ -1,11 +1,13 @@
 # model.py
 import pandas as pd
+from pathlib import Path
 
 import joblib
 
 # ============================================================
 # CHARGEMENT LOCAL DU MODÈLE
 # ============================================================
+ROOT_DIR = Path(__file__).resolve().parent
 ARTIFACT = joblib.load("theatre_model.joblib")
 model = ARTIFACT["model"]
 encoders = ARTIFACT["encoders"]
