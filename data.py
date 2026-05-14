@@ -1,7 +1,9 @@
 # data.py
 import pandas as pd
+from pathlib import Path
 
 
+ROOT_DIR = Path(__file__).resolve().parent
 
 # ── Chargement local du dataset ──────────────────────────────
 DF = pd.read_parquet("theatre_data.parquet")    
