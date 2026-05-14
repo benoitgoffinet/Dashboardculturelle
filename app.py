@@ -5,7 +5,7 @@ import dash_bootstrap_components as dbc
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
-import numpy as npapp.run
+import numpy as np
 import os
 
 from data import DF, VARIABLES_CATEGORIELLES, VARIABLES_NUMERIQUES
