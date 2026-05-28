@@ -283,7 +283,7 @@ layout_analyse = html.Div([
     ], className="split-row", style={"display": "flex", "gap": "12px", "marginBottom": "16px", "flexWrap": "wrap"}),
 
     # Ligne 3 : importance features
-    card([html.H4("🧠 Importance des Variables (Modèle ML)",
+    card([html.H4("Facteurs ayant le plus d’impact sur la fréquentation prédite",
                   style={"color": C["text"], "margin": "0 0 8px",
                          "fontSize": "14px"}),
           dcc.Graph(id="g-importance",
