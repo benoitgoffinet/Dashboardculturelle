@@ -112,33 +112,35 @@ app.layout = html.Div(
             html.Div([
                  html.A(
                     [
-                        "BenIA",
-                        html.Span(".Solutions")
+                        html.Span("BenIA", className="logo-main"),
+                        html.Span(".Solutions", className="logo-accent")
                     ],
                     className="logo",
                     href="https://websitebenia-production.up.railway.app/",
-                    style={
-                        "color": "#fff",
-                        "textDecoration": "none",
-                        "fontWeight": "800",
-                        "fontSize": "1.2rem",
-                    }, target ='blank',
+                    target ='blank',
                 ),
-                html.H1("Dashboard de présentation",
-                        style={"color": C["text"], "margin": 0,
-                               "fontSize": "16px", "fontWeight": "700"}),
-            ], style={"minWidth": "230px", "flex": "1"}),
+                html.Div([
+                    html.H1("Dashboard de présentation", className="header-title"),
+                    html.P("Analyse culturelle & prédiction d'affluence", className="header-subtitle")
+                ], className="header-copy")
+            ], className="header-brand"),
             html.Div([
-                html.Span(f"MAE : ±{MAE} spectateurs",
-                          style={"color": C["orange"], "fontSize": "13px",
-                                 "marginRight": "20px"}),
-                html.Span(f"R² : {R2}",
-                          style={"color": C["green"], "fontSize": "13px"})
-            ])
-        ], className="app-header", style={"display": "flex", "justifyContent": "space-between",
-                  "alignItems": "center",
-                  "borderBottom": f"1px solid {C['border']}",
-                  "paddingBottom": "14px", "marginBottom": "20px"}),
+                 html.Div([
+                    html.Span("🎯", className="metric-icon"),
+                    html.Div([
+                        html.Span("MAE", className="metric-label"),
+                        html.Span(f"±{MAE} spectateurs", className="metric-value mae")
+                    ], className="metric-text")
+                ], className="metric-chip"),
+                html.Div([
+                    html.Span("📈", className="metric-icon"),
+                    html.Div([
+                        html.Span("R²", className="metric-label"),
+                        html.Span(f"{R2}", className="metric-value r2")
+                    ], className="metric-text")
+                ], className="metric-chip")
+            ], className="header-metrics")
+        ], className="app-header"),
 
         # ── ONGLETS ──────────────────────────────────────────
         dcc.Tabs(
