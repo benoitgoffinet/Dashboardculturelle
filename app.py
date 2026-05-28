@@ -110,6 +110,10 @@ app.layout = html.Div(
         # ── HEADER ──────────────────────────────────────────
         html.Div([
             html.Div([
+                html.A([
+                    "BenIA",
+                    html.Span(".Solutions")
+                ], className="logo", href="https://websitebenia-production.up.railway.app/"),
                 html.H1("🎭 Organisme fictif",
                         style={"color": C["text"], "margin": 0,
                                "fontSize": "24px", "fontWeight": "700"}),
