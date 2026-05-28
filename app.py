@@ -110,11 +110,20 @@ app.layout = html.Div(
         # ── HEADER ──────────────────────────────────────────
         html.Div([
             html.Div([
-                html.A([
-                    "BenIA",
-                    html.Span(".Solutions")
-                ], className="logo", href="https://websitebenia-production.up.railway.app/"),
-                style={"color": "#fff", "textDecoration": "none", "fontWeight": "800", "fontSize": "1.2rem"}),
+                 html.A(
+                    [
+                        "BenIA",
+                        html.Span(".Solutions")
+                    ],
+                    className="logo",
+                    href="https://websitebenia-production.up.railway.app/",
+                    style={
+                        "color": "#fff",
+                        "textDecoration": "none",
+                        "fontWeight": "800",
+                        "fontSize": "1.2rem",
+                    },
+                ),
                 html.H1("Dashboard de présentation",
                         style={"color": C["text"], "margin": 0,
                                "fontSize": "16px", "fontWeight": "700"}),
