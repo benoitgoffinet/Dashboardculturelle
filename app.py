@@ -114,12 +114,10 @@ app.layout = html.Div(
                     "BenIA",
                     html.Span(".Solutions")
                 ], className="logo", href="https://websitebenia-production.up.railway.app/"),
+                style={"color": "#fff", "textDecoration": "none", "fontWeight": "800", "fontSize": "1.2rem"}),
                 html.H1("Dashboard de présentation",
                         style={"color": C["text"], "margin": 0,
-                               "fontSize": "24px", "fontWeight": "700"}),
-                html.P("Dashboard prédictif d'affluence",
-                       style={"color": C["sub"], "margin": "4px 0 0",
-                              "fontSize": "13px"})
+                               "fontSize": "16px", "fontWeight": "700"}),
             ], style={"minWidth": "230px", "flex": "1"}),
             html.Div([
                 html.Span(f"MAE : ±{MAE} spectateurs",
