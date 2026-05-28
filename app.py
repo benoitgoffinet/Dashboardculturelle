@@ -122,7 +122,7 @@ app.layout = html.Div(
                         "textDecoration": "none",
                         "fontWeight": "800",
                         "fontSize": "1.2rem",
-                    },
+                    }, target ='blank',
                 ),
                 html.H1("Dashboard de présentation",
                         style={"color": C["text"], "margin": 0,
