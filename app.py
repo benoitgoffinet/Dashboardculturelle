@@ -747,10 +747,10 @@ def update_analyse(genres, jours, saisons, horaires, meteos, metric):
     fig_imp = theme_fig(fig_imp, height=300)
 
     titre_ev = f"📈 Évolution de {metric_label.lower()}"
-    titre_prix = f"💶 {metric_label} moyen par prix"
+    titre_prix = f"💶 {metric_label} moyen(ne) par prix"
     titre_genre = f"🎭 {metric_label} par Genre"
     titre_dist = f"📦 Distribution de {metric_label.lower()}"
-    titre_heat = f"🗓️ Heatmap {metric_label} (Jour × Saison)"
+    titre_heat = f"🗓️ Heatmap {metric_label} moyen(ne) (Jour × Saison)"
     return kpis, titre_ev, titre_genre, fig_ev, fig_donut, titre_prix, fig_prix, titre_dist, fig_box, titre_heat, fig_heat, fig_imp
 
 
