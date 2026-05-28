@@ -224,11 +224,11 @@ layout_analyse = html.Div([
             dcc.RadioItems(
                 id="f-metric",
                 options=[
+                    {"label": " Chiffre d'affaires", "value": "chiffre_affaire"},
                     {"label": " Affluence", "value": "affluence"},
                     {"label": " Taux remplissage (%)", "value": "taux_remplissage"},
-                    {"label": " Chiffre d'affaires", "value": "chiffre_affaire"},
                 ],
-                value="affluence",
+                value="chiffre_affaire",
                 inline=True,
                 labelStyle={"color": "white", "fontSize": "13px", "marginRight": "20px"},
                 inputStyle={"marginRight": "5px", "marginLeft": "0px"}
