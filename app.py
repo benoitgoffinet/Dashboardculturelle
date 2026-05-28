@@ -114,7 +114,7 @@ app.layout = html.Div(
                     "BenIA",
                     html.Span(".Solutions")
                 ], className="logo", href="https://websitebenia-production.up.railway.app/"),
-                html.H1("🎭 Organisme fictif",
+                html.H1("Dashboard de présentation",
                         style={"color": C["text"], "margin": 0,
                                "fontSize": "24px", "fontWeight": "700"}),
                 html.P("Dashboard prédictif d'affluence",
