@@ -37,6 +37,7 @@ app = dash.Dash(
     suppress_callback_exceptions=True,
 )
 
+print("SERVER CREATED")
 server = app.server
 
 
@@ -127,7 +128,7 @@ DROPDOWN_STYLE = {
 
 #LAYOUT
 
-
+print("LAYOUT START")
 app.layout = html.Div(className="app-shell",style={"minHeight": "100vh","fontFamily": "'Inter', 'Segoe UI', sans-serif","padding": "16px 24px"},children=[
 
     # ── HEADER ──────────────────────────────────────────
@@ -655,7 +656,7 @@ layout_data = html.Div([card([html.Div([html.H4("📋 Données brutes",style={"c
 #ROUTING ONGLETS
 
 
-
+print("LAYOUT END")
 @app.callback(
     Output("contenu-onglet", "children"),
     Input("onglets", "value")
