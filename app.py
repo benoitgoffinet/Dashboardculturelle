@@ -15,6 +15,9 @@ from data import (
     VARIABLES_CATEGORIELLES,
     VARIABLES_NUMERIQUES
 )
+print("DATA IMPORT OK")
+
+
 
 from model import (
     predire_affluence,
@@ -22,7 +25,7 @@ from model import (
     MAE,
     R2
 )
-
+print("MODEL IMPORT OK")
 
 #INIT
 
