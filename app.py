@@ -705,6 +705,7 @@ def update_analyse(
     metric,
     critere,
 ):
+    print("=== UPDATE_ANALYSE EXECUTE ===")
     df = DF.copy()
 
     metric_labels = {
@@ -880,6 +881,7 @@ def update_analyse(
 )
 def update_filter_values(col):
 
+    print("=== UPDATE_filter ===")
     if not col:
         return []
 
@@ -899,6 +901,7 @@ def update_filter_values(col):
 )
 def update_variable_options(var1, var2):
 
+    print("=== UPDATE_variableEoption ===")
     opts_var1 = [
         {
             "label": v.replace("_", " ").title(),
@@ -940,7 +943,7 @@ def update_variable(
     filter_col,
     filter_val,
 ):
-
+    print("=== UPDATE_variable ===")
     df = DF.copy()
 
     # Application du filtre
@@ -1026,7 +1029,7 @@ def predict(
     promo,
 ):
     # suite de la fonction...
-
+    print("=== UPDATE_predict ===")
     est_we = 1 if jour in ["Samedi", "Dimanche"] else 0
 
     params = {
